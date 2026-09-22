@@ -1,9 +1,9 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig([
-  // Runtime build (Dual CJS and ESM, zero external dependencies)
+  // Runtime build (Dual CJS and ESM, Node & Browser safe, zero external dependencies)
   {
-    entry: ["src/index.ts"],
+    entry: ["src/index.ts", "src/browser.ts"],
     format: ["cjs", "esm"],
     dts: true,
     clean: true,

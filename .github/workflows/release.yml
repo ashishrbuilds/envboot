@@ -33,13 +33,23 @@ jobs:
       - name: Build Package
         run: npm run build
 
-      # 1. Publish to npmjs.org
+      # 1. Publish to npmjs.org (Public npm Registry)
       - name: Publish to npm
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # 2. Create GitHub Release
+      # 2. Publish to GitHub Packages (@ashishrbuilds/envboot)
+      - name: Publish to GitHub Packages
+        run: |
+          npm pkg set name="@ashishrbuilds/envboot"
+          npm config set //npm.pkg.github.com/:_authToken "${GITHUB_TOKEN}"
+          npm config set @ashishrbuilds:registry "https://npm.pkg.github.com"
+          npm publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 3. Create GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:

@@ -15,13 +15,15 @@
 <br />
 
 ```bash
-npx envboot init
+npx envboot@latest init
 ```
 
 [**Quickstart**](#-quick-start) &bull;
 [**Why EnvBoot?**](#-why-envboot) &bull;
 [**Interactive Demo**](#-the-30-second-demo) &bull;
-[**CI/CD Guard**](#-cicd-drift-protection) &bull;
+[**Doctor Diagnostics**](#-diagnostic-health-check-envboot-doctor) &bull;
+[**Sync Contract**](#-synchronizing-contract--templates-envboot-sync) &bull;
+[**CI/CD Guard**](#-cicd-drift-protection-envboot-check) &bull;
 [**Runtime API**](#-runtime-api) &bull;
 [**Ecosystem**](#-supported-runtimes--package-managers)
 
@@ -53,7 +55,7 @@ The application boots up silently. **5 minutes later in production or testing:**
 Run **EnvBoot** once:
 
 ```bash
-npx envboot init   # or bunx envboot init / pnpm dlx envboot init
+npx envboot@latest init   # or bunx envboot@latest init / pnpm dlx envboot@latest init
 ```
 
 EnvBoot scans your codebase, extracts all `process.env`, `Bun.env`, `Deno.env`, and `import.meta.env` usage, creates a typed `.envboot.json` contract, and installs a lightweight startup guard.
@@ -116,22 +118,22 @@ Run the interactive setup wizard in your favorite package manager:
 
 ```bash
 # npm
-npx envboot init
+npx envboot@latest init
 
 # bun
-bunx envboot init
+bunx envboot@latest init
 
 # pnpm
-pnpm dlx envboot init
+pnpm dlx envboot@latest init
 
 # yarn
-yarn dlx envboot init
+yarn dlx envboot@latest init
 
 # Deno
-deno run --allow-all npm:envboot init
+deno run --allow-all npm:envboot@latest init
 ```
 
-> **Prefer non-interactive?** Pass `--yes` to accept all detected variables: `npx envboot init --yes`
+> **Prefer non-interactive?** Pass `--yes` to accept all detected variables: `npx envboot@latest init --yes`
 
 ### 2. Startup Guard Injection
 
@@ -369,31 +371,31 @@ console.log(status.presentRequired); // string[]
   <tbody>
     <tr>
       <td><b>Node.js (npm)</b></td>
-      <td><code>npx envboot init</code></td>
+      <td><code>npx envboot@latest init</code></td>
       <td><code>npm run dev</code></td>
       <td><code>npx envboot check</code></td>
     </tr>
     <tr>
       <td><b>Bun</b></td>
-      <td><code>bunx envboot init</code></td>
+      <td><code>bunx envboot@latest init</code></td>
       <td><code>bun dev</code></td>
       <td><code>bunx envboot check</code></td>
     </tr>
     <tr>
       <td><b>pnpm</b></td>
-      <td><code>pnpm dlx envboot init</code></td>
+      <td><code>pnpm dlx envboot@latest init</code></td>
       <td><code>pnpm dev</code></td>
       <td><code>pnpm dlx envboot check</code></td>
     </tr>
     <tr>
       <td><b>Yarn</b></td>
-      <td><code>yarn dlx envboot init</code></td>
+      <td><code>yarn dlx envboot@latest init</code></td>
       <td><code>yarn dev</code></td>
       <td><code>yarn dlx envboot check</code></td>
     </tr>
     <tr>
       <td><b>Deno</b></td>
-      <td><code>deno run -A npm:envboot init</code></td>
+      <td><code>deno run -A npm:envboot@latest init</code></td>
       <td><code>deno task dev</code></td>
       <td><code>deno run -A npm:envboot check</code></td>
     </tr>

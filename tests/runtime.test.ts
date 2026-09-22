@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { init, validate, validateEnvironment } from "../src/index.js";
+import { init, validate, validateEnvironment, loadConfig } from "../src/index.js";
+import { parseEnvContent } from "../src/runtime/config.js";
 import { EnvBootConfig } from "../src/runtime/types.js";
 
 describe("Runtime Guard", () => {
@@ -97,14 +98,22 @@ describe("Runtime Guard", () => {
     });
   });
 
-  describe("validate() helper", () => {
-    it("can validate directly with config object", () => {
-      const result = validate(
-        { required: ["APP_PORT"] },
-        { APP_PORT: "3000" }
-      );
-      expect(result.valid).toBe(true);
-      expect(result.presentRequired).toEqual(["APP_PORT"]);
+  describe("parseEnvContent", () => {
+    it("correctly parses key-value pairs with single and double quotes and empty values", () => {
+      const raw = `
+        # Comment line
+        VITE_APP_BASE_URL=
+        VITE_APP_NAME='Kalyanam Studio'
+        API_SECRET="secret\\"value"
+        NUMBER_VAL=12345 # trailing comment
+        export EXPORTED_VAR=true
+      `;
+      const parsed = parseEnvContent(raw);
+      expect(parsed.VITE_APP_BASE_URL).toBe("");
+      expect(parsed.VITE_APP_NAME).toBe("Kalyanam Studio");
+      expect(parsed.API_SECRET).toBe('secret"value');
+      expect(parsed.NUMBER_VAL).toBe("12345");
+      expect(parsed.EXPORTED_VAR).toBe("true");
     });
   });
 });

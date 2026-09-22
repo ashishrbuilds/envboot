@@ -1,6 +1,8 @@
 import { cac } from "cac";
 import { runInit } from "./commands/init.js";
 import { runCheck } from "./commands/check.js";
+import { runDoctor } from "./commands/doctor.js";
+import { runSync } from "./commands/sync.js";
 
 const cli = cac("envboot");
 
@@ -33,7 +35,42 @@ cli
     }
   });
 
+cli
+  .command("doctor", "Run diagnostic health check on environment, contract, and setup")
+  .option("-c, --config <path>", "Custom path to .envboot.json")
+  .action(async (options) => {
+    try {
+      const passed = await runDoctor({
+        config: options.config,
+      });
+      if (!passed) {
+        process.exit(1);
+      }
+    } catch (err) {
+      console.error("\nDoctor encountered an error:", (err as Error).message);
+      process.exit(1);
+    }
+  });
+
+cli
+  .command("sync", "Synchronize .envboot.json and .env.example with current codebase")
+  .option("-y, --yes", "Automatically accept and sync all discovered variables")
+  .option("-c, --config <path>", "Custom path to .envboot.json")
+  .option("--prune", "Remove variables from contract that are no longer used in code")
+  .action(async (options) => {
+    try {
+      await runSync({
+        yes: options.yes,
+        config: options.config,
+        prune: options.prune,
+      });
+    } catch (err) {
+      console.error("\nSync command encountered an error:", (err as Error).message);
+      process.exit(1);
+    }
+  });
+
 cli.help();
-cli.version("0.1.4");
+cli.version("0.1.5");
 
 cli.parse();

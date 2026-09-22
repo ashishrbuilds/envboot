@@ -1,4 +1,4 @@
-import { loadConfig } from "./runtime/config.js";
+import { loadConfig, loadProjectEnv } from "./runtime/config.js";
 import { logMissingConfigFile, logValidationFailure } from "./runtime/logger.js";
 import { InitOptions, ValidationResult, EnvBootConfig } from "./runtime/types.js";
 import { validateEnvironment, getRuntimeEnv } from "./runtime/validator.js";
@@ -15,7 +15,8 @@ function exitProcess(code: number = 1): void {
 
 /**
  * Initializes EnvBoot startup validation.
- * Reads `.envboot.json` and verifies that all required variables are set in process.env.
+ * Reads `.envboot.json` and verifies that all required variables are set.
+ * Automatically loads and parses local `.env*` files merged with system environment.
  * If required variables are missing, prints an error message and terminates the process with exit code 1.
  */
 export function init(options: InitOptions = {}): ValidationResult {
@@ -24,7 +25,7 @@ export function init(options: InitOptions = {}): ValidationResult {
     cwd = process.cwd ? process.cwd() : ".",
     exitOnError = true,
     quiet = false,
-    env = getRuntimeEnv(),
+    env = loadProjectEnv(cwd),
   } = options;
 
   const config = loadConfig(configPath, cwd);

@@ -19,13 +19,27 @@ describe("Browser Runtime", () => {
     expect(result.missingOptional).toEqual(["VITE_ANALYTICS_KEY"]);
   });
 
-  it("handles missing variables in browser mode gracefully without process.exit", () => {
+  it("throws fatal error in browser mode when exitOnError is true and variables are missing", () => {
+    expect(() => {
+      init({
+        config: {
+          required: ["VITE_SECRET_API_KEY"],
+        },
+        env: {},
+        quiet: true,
+        exitOnError: true,
+      });
+    }).toThrow("[envboot] Environment validation failed. Missing required environment variable(s): VITE_SECRET_API_KEY");
+  });
+
+  it("returns invalid result without throwing when exitOnError is false", () => {
     const result = init({
       config: {
         required: ["VITE_SECRET_API_KEY"],
       },
       env: {},
       quiet: true,
+      exitOnError: false,
     });
 
     expect(result.valid).toBe(false);

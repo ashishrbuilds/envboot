@@ -9,7 +9,7 @@ export async function promptVariableClassification(
   }
 
   p.note(
-    "Select variables that MUST be present for your app to start.\nUnchecked variables will be marked as optional.",
+    `Navigation:\n  • Press ${pc.cyan("<space>")} to check/uncheck\n  • Press ${pc.cyan("<a>")} to toggle all\n  • Press ${pc.cyan("↑/↓")} to move\n  • Press ${pc.cyan("<enter>")} to confirm\n\nUnchecked variables are marked as optional.`,
     "Configure Environment Contract"
   );
 

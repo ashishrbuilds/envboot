@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import pc from "picocolors";
-import { loadConfig } from "../../runtime/config.js";
+import { loadConfig, loadProjectEnv } from "../../runtime/config.js";
 import { validateEnvironment } from "../../runtime/validator.js";
 import { scanProject } from "../core/scanner.js";
 import { printCheckReport, CheckReportData } from "../ui/reporter.js";
@@ -25,8 +25,9 @@ export async function runCheck(options: CheckCommandOptions = {}): Promise<boole
     process.exit(1);
   }
 
-  // 1. Validate actual environment vs contract
-  const validationResult = validateEnvironment(config, process.env);
+  // 1. Validate actual environment (merging .env files + system env) vs contract
+  const projectEnv = loadProjectEnv(cwd);
+  const validationResult = validateEnvironment(config, projectEnv);
 
   // 2. Scan project for source drift and dead env variables
   const scanResult = await scanProject(cwd);

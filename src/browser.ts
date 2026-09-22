@@ -34,6 +34,7 @@ export function logBrowserFailure(result: ValidationResult): void {
 export function init(options: InitOptions & { config?: EnvBootConfig } = {}): ValidationResult {
   const {
     quiet = false,
+    exitOnError = true,
     env = getBrowserEnv(),
     config: directConfig,
   } = options;
@@ -46,8 +47,14 @@ export function init(options: InitOptions & { config?: EnvBootConfig } = {}): Va
 
   const result = validateEnvironment(config, env);
 
-  if (!result.valid && !quiet) {
-    logBrowserFailure(result);
+  if (!result.valid) {
+    if (!quiet) {
+      logBrowserFailure(result);
+    }
+    if (exitOnError) {
+      const missing = result.missingRequired.join(", ");
+      throw new Error(`[envboot] Environment validation failed. Missing required environment variable(s): ${missing}`);
+    }
   }
 
   return result;

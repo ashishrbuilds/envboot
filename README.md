@@ -157,6 +157,92 @@ envboot.init();
 
 ---
 
+## 🛑 Crashing Dev Servers & Client Apps on Startup
+
+### 1. Block Dev Server Startup (`pnpm dev` / `npm run dev`)
+To prevent Vite, Next.js, or Express dev servers from opening when `.env` is incomplete, prepend `envboot check` to your `package.json` scripts:
+
+```json
+{
+  "scripts": {
+    "dev": "envboot check && vite",
+    "build": "envboot check && tsc -b && vite build"
+  }
+}
+```
+
+Whenever you run `pnpm dev`, if any required variable in `.env` is missing or empty, `envboot check` halts with exit code `1` before Vite / Next.js ever boots.
+
+### 2. Browser & Frontend Runtime Guard (Vite / React / Next.js)
+In client-side entrypoints (`src/main.tsx` or `src/index.tsx`), you can throw a fatal startup error before React mounts:
+
+```tsx
+import envboot from "envboot";
+import config from "../.envboot.json";
+
+// Throws fatal error & displays error overlay if required variables are missing
+envboot.init({
+  config,
+  env: import.meta.env,
+  exitOnError: true
+});
+
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+...
+```
+
+---
+
+## 🩺 Diagnostic Health Check (`envboot doctor`)
+
+Run `envboot doctor` to perform an end-to-end diagnostic of your framework, package manager, `.env` files, contract schema, and startup injection:
+
+```bash
+npx envboot doctor   # or pnpm dlx envboot doctor / bunx envboot doctor
+```
+
+```text
+ 🩺 EnvBoot Doctor — Diagnostic Health Check 
+
+Project Environment
+────────────────────────────────────────────────────────────
+  Framework:        VITE
+  Package Manager:  pnpm
+  Module Type:      ESM
+  Entry Point:      src/main.tsx (✓ Injected)
+  Contract:         .envboot.json (✓ Found)
+  Env Files:        .env, .env.local
+
+Diagnostics & Health
+────────────────────────────────────────────────────────────
+  ✓ Package dependency: envboot (0.1.5)
+  ✓ Contract schema: 2 required, 1 optional variable(s)
+  ✓ All required variables are set in environment
+  ✓ Source code and contract are fully in sync (0 drift)
+
+✨ Everything looks healthy! No issues detected.
+```
+
+---
+
+## 🔄 Synchronizing Contract & Templates (`envboot sync`)
+
+When you introduce new environment variables to your codebase, run `envboot sync` to automatically detect them, update `.envboot.json`, and regenerate `.env.example`:
+
+```bash
+# Interactive classification
+npx envboot sync
+
+# Automated sync in CI or pre-commit hooks
+npx envboot sync --yes
+
+# Automatically prune variables removed from codebase
+npx envboot sync --yes --prune
+```
+
+---
+
 ## 🔍 CI/CD Drift Protection (`envboot check`)
 
 Run `envboot check` in local verification or CI/CD pipelines to ensure that:

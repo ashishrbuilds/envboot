@@ -1,6 +1,6 @@
 {
   "name": "envboot",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Zero-runtime-dependency environment contract and validation tool for JavaScript and TypeScript projects",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

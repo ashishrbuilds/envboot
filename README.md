@@ -1,136 +1,155 @@
-# EnvBoot 🚀
+<div align="center">
 
-> **Your app shouldn't start with a broken environment.**
+# ⚡ EnvBoot
 
-Automatically discover, configure, and validate environment variables across **Node.js, Bun, Deno, Next.js, Vite, and Express** with **zero runtime dependencies**.
+### *Your app shouldn't start with a broken environment.*
 
-[![npm version](https://img.shields.io/npm/v/envboot.svg)](https://www.npmjs.com/package/envboot)
-[![GitHub](https://img.shields.io/github/stars/ashishrbuilds/envboot?style=social)](https://github.com/ashishrbuilds/envboot)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Zero Dependencies](https://img.shields.io/badge/runtime%20dependencies-0-success.svg)](https://www.npmjs.com/package/envboot)
+**Automatically discover, configure, and validate environment variables with zero runtime overhead.**
 
----
+[![npm version](https://img.shields.io/npm/v/envboot?color=38bdf8&label=npm%20package)](https://www.npmjs.com/package/envboot)
+[![GitHub Stars](https://img.shields.io/github/stars/ashishrbuilds/envboot?style=social)](https://github.com/ashishrbuilds/envboot)
+[![Runtime Dependencies](https://img.shields.io/badge/runtime%20dependencies-0-10b981.svg)](https://www.npmjs.com/package/envboot)
+[![Node / Bun / Deno](https://img.shields.io/badge/runtimes-Node%20%7C%20Bun%20%7C%20Deno-a855f7)](https://www.npmjs.com/package/envboot)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-## The Problem
-
-A developer clones an existing project:
-
-```bash
-git clone https://github.com/ashishrbuilds/envboot.git
-cd envboot
-bun install  # or npm / pnpm / yarn / deno
-bun dev
-```
-
-Application starts. 5 minutes later during testing:
-- ❌ Database connection failed (`DATABASE_URL` is undefined)
-- ❌ Auth crashed (`JWT_SECRET` missing)
-- ❌ Feature X threw runtime TypeError
-
----
-
-## The Solution: 30-Second Killer Demo
-
-Run the setup wizard with your favorite package manager:
+<br />
 
 ```bash
-# npm
 npx envboot init
-
-# pnpm
-pnpm dlx envboot init
-
-# bun
-bunx envboot init
-
-# yarn
-yarn dlx envboot init
-
-# deno
-deno run --allow-all npm:envboot init
 ```
 
-The CLI scans your codebase, detects environment usage (`process.env.*`, `import.meta.env.*`, `Bun.env.*`, `Deno.env.get(*)`, `.env*` files), generates an environment contract (`.envboot.json`), and installs a startup guard into your entry point.
+[**Quickstart**](#-quick-start) &bull;
+[**Why EnvBoot?**](#-why-envboot) &bull;
+[**Interactive Demo**](#-the-30-second-demo) &bull;
+[**CI/CD Guard**](#-cicd-drift-protection) &bull;
+[**Runtime API**](#-runtime-api) &bull;
+[**Ecosystem**](#-supported-runtimes--package-managers)
 
-Now, whenever anyone starts the application:
+</div>
+
+<br />
+
+---
+
+## 💥 The Problem
+
+You or a teammate clones a repository:
 
 ```bash
-npm run dev   # or bun dev / pnpm dev / yarn dev / deno task dev
+git clone https://github.com/org/repo.git
+cd repo && npm install
+npm run dev
 ```
 
-If required environment variables are missing, it fails fast **immediately at boot**:
+The application boots up silently. **5 minutes later in production or testing:**
+* ❌ Database connection fails (`DATABASE_URL` is `undefined`)
+* ❌ Auth handler throws `TypeError` (`JWT_SECRET` is missing)
+* ❌ Third-party webhook silently drops events (`STRIPE_WEBHOOK_SECRET` was never configured)
+
+---
+
+## 🛡️ The Solution: The 30-Second Demo
+
+Run **EnvBoot** once:
+
+```bash
+npx envboot init   # or bunx envboot init / pnpm dlx envboot init
+```
+
+EnvBoot scans your codebase, extracts all `process.env`, `Bun.env`, `Deno.env`, and `import.meta.env` usage, creates a typed `.envboot.json` contract, and installs a lightweight startup guard.
+
+```text
+┌  EnvBoot Setup
+│
+◇  Scanned 34 source files — Discovered 4 environment variables.
+│
+◆  Select REQUIRED variables (unselected become optional):
+│  ● DATABASE_URL       (Required for boot)
+│  ● JWT_SECRET         (Required for boot)
+│  ○ REDIS_URL          (Optional)
+│  ○ SENTRY_DSN         (Optional)
+│
+◇  Entry point detected: src/server.ts
+│
+✓  EnvBoot installed successfully!
+```
+
+Now, whenever anyone boots the application without the required environment:
 
 ```text
 ❌ Environment validation failed
 
 Missing required environment variables:
-
   • DATABASE_URL
   • JWT_SECRET
 
 Optional variables missing:
-
   • REDIS_URL
 
 Application startup cancelled.
 Set the required variables in your .env file or environment before starting.
 ```
 
-Developer fixes their `.env` file, starts the app, and everything runs smoothly.
+**The application halts instantly before damaged connections or corrupted transactions occur.**
 
 ---
 
-## Key Features
+## ✨ Why EnvBoot?
 
-- ⚡ **Zero Runtime Dependencies**: The runtime guard has **0 dependencies** and works out of the box on **Node.js, Bun, and Deno**.
-- 📦 **Works With All Package Managers**: First-class support for **npm, pnpm, bun, yarn, and deno**.
-- 🔍 **Universal Variable Scanner**: Scans for `process.env.X`, `import.meta.env.X`, `Bun.env.X`, `Deno.env.get("X")`, and all `.env*` files.
-- 🎯 **Non-Invasive**: Keep using standard native syntax (`process.env.DATABASE_URL` or `Bun.env.DATABASE_URL`) — no wrapper objects or refactoring required.
-- 🚀 **Smart Entry-Point & Framework Detection**: Automatically configures **Node.js, Bun, Deno, Express, Vite, Next.js, and NestJS**.
-- 🔒 **CI/CD Drift Checker**: `envboot check` ensures that your production environment and codebase never drift apart — **with guaranteed secret masking**.
-- 🛠️ **Safe Preview & Confirmation**: Never modifies your files without showing an interactive git diff preview and asking confirmation.
+| Feature | `envboot` | Manual Checks | `zod` / Schema libs | `dotenv-safe` |
+| :--- | :---: | :---: | :---: | :---: |
+| **Runtime Dependencies** | **`0` (Zero)** | `0` | Heavy (~50kb+) | 3+ deps |
+| **Code Refactoring** | **None** (Keep `process.env.X`) | High boilerplate | Requires `env.X` wrappers | None |
+| **Automated AST Codebase Scanner** | **Yes** | ❌ No | ❌ No | ❌ No |
+| **Interactive Setup CLI** | **Yes** | ❌ No | ❌ No | ❌ No |
+| **CI/CD Drift & Stale Var Detection** | **Yes** | ❌ No | ❌ No | Partial |
+| **Multi-Runtime (Node, Bun, Deno)** | **Yes** | Manual | Varies | Node only |
+| **Secret Masking Guarantee** | **Yes** | Manual | Manual | Partial |
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
 ### 1. Initialize your project
+
+Run the interactive setup wizard in your favorite package manager:
 
 ```bash
 # npm
 npx envboot init
 
-# pnpm
-pnpm dlx envboot init
-
 # bun
 bunx envboot init
+
+# pnpm
+pnpm dlx envboot init
 
 # yarn
 yarn dlx envboot init
 
-# deno
+# Deno
 deno run --allow-all npm:envboot init
 ```
 
-Interactive prompts will guide you to classify detected variables as **Required** or **Optional**, preview the changes, and install the guard.
+> **Prefer non-interactive?** Pass `--yes` to accept all detected variables: `npx envboot init --yes`
 
-### 2. Runtime Protection
+### 2. Startup Guard Injection
 
-The CLI automatically adds the runtime guard to your entry point:
+EnvBoot automatically places the guard at the very top of your application entry point:
 
 ```typescript
 import envboot from "envboot";
 
 envboot.init();
 
-// Your application code continues using standard APIs:
+// Continue writing standard native code without any wrappers:
 import express from "express";
+
 const app = express();
 const dbUrl = process.env.DATABASE_URL || Bun.env.DATABASE_URL;
 ```
 
-*CommonJS is also supported:*
+*CommonJS is fully supported:*
 ```javascript
 const envboot = require("envboot");
 envboot.init();
@@ -138,30 +157,18 @@ envboot.init();
 
 ---
 
-## Commands
+## 🔍 CI/CD Drift Protection (`envboot check`)
 
-### `envboot init`
-
-Scans your project, builds `.envboot.json`, and installs the startup guard.
-
-```bash
-# Interactive setup
-npx envboot init          # or bunx envboot init / pnpm dlx envboot init
-
-# Non-interactive mode (accept defaults in CI or scripts)
-npx envboot init --yes
-```
-
-### `envboot check`
-
-Validates your current environment against `.envboot.json`, and scans for source drift and unused variables:
+Run `envboot check` in local verification or CI/CD pipelines to ensure that:
+1. All required variables are present in the current execution environment.
+2. The codebase has not introduced undocumented environment variables (**Drift Detection**).
+3. Stale variables defined in `.env` files that are no longer used in code are flagged.
 
 ```bash
-# Run check
-npx envboot check         # or bunx envboot check / pnpm dlx envboot check
+npx envboot check
 ```
 
-**Sample Output:**
+### Sample Output
 
 ```text
 EnvBoot Check
@@ -181,21 +188,15 @@ Source analysis
 ────────────────────────────────────────
   ⚠ STRIPE_SECRET_KEY
     Used in source (src/billing.ts) but missing from .envboot.json
-  ⚠ OLD_API_URL
-    Found in .env.example but not used in source code
+  ⚠ OLD_ANALYTICS_KEY
+    Found in .env.example but not referenced in source code
 
 ────────────────────────────────────────
 Result: FAILED
 Error: Missing 1 required environment variable(s).
 ```
 
----
-
-## CI / CD Integration
-
-Add `envboot check` to your CI pipeline. EnvBoot returns exit code `0` on success and `1` on missing required variables.
-
-### GitHub Actions (Node / Bun / Deno)
+### GitHub Actions Workflow Recipe
 
 ```yaml
 name: CI
@@ -219,11 +220,13 @@ jobs:
 ```
 
 > [!NOTE]
-> **Secret Protection Guarantee**: EnvBoot **never** prints environment variable values to the console or logs — only whether they are present (`✓`) or missing (`✗`).
+> **Secret Shield**: EnvBoot **never** prints secret values to console output or CI logs — only verification status (`✓` or `✗`).
 
 ---
 
-## Configuration (`.envboot.json`)
+## ⚙️ Configuration (`.envboot.json`)
+
+The generated `.envboot.json` contract is lightweight, human-readable, and version-controlled:
 
 ```json
 {
@@ -241,42 +244,87 @@ jobs:
 
 ---
 
-## Runtime API Options
+## 📦 Runtime API
 
 ```typescript
 import envboot from "envboot";
 
-// Default startup validation
+// Standard startup check (halts process with exit code 1 if invalid)
 envboot.init();
 
-// Advanced options:
+// Advanced configuration
 envboot.init({
-  configPath: "./custom-config.json", // Custom path to config
-  exitOnError: false,                // Don't terminate process on failure
-  quiet: false,                      // Suppress failure logs
-  env: process.env,                  // Custom env dictionary (defaults to runtime env)
+  configPath: "./config/.envboot.json", // Custom path to config
+  exitOnError: false,                   // Return status instead of process.exit(1)
+  quiet: false,                         // Suppress terminal output
+  env: process.env,                     // Custom environment object
 });
 
-// Non-terminating validation helper:
-const result = envboot.validate();
-console.log(result.valid); // boolean
-console.log(result.missingRequired); // string[]
+// Non-terminating programmatic check
+const status = envboot.validate();
+console.log(status.valid);           // boolean
+console.log(status.missingRequired); // string[]
+console.log(status.presentRequired); // string[]
 ```
 
 ---
 
-## Supported Runtimes & Package Managers
+## 🌐 Supported Runtimes & Package Managers
 
-| Tool / Runtime | Setup Command | Dev Command | Check Command |
-| :--- | :--- | :--- | :--- |
-| **Node.js + npm** | `npx envboot init` | `npm run dev` | `npx envboot check` |
-| **pnpm** | `pnpm dlx envboot init` | `pnpm dev` | `pnpm dlx envboot check` |
-| **Bun** | `bunx envboot init` | `bun dev` | `bunx envboot check` |
-| **Yarn** | `yarn dlx envboot init` | `yarn dev` | `yarn dlx envboot check` |
-| **Deno** | `deno run --allow-all npm:envboot init` | `deno task dev` | `deno run --allow-all npm:envboot check` |
+<table align="center">
+  <thead>
+    <tr>
+      <th align="left">Ecosystem</th>
+      <th align="left">Setup Command</th>
+      <th align="left">Dev Run</th>
+      <th align="left">CI Check</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>Node.js (npm)</b></td>
+      <td><code>npx envboot init</code></td>
+      <td><code>npm run dev</code></td>
+      <td><code>npx envboot check</code></td>
+    </tr>
+    <tr>
+      <td><b>Bun</b></td>
+      <td><code>bunx envboot init</code></td>
+      <td><code>bun dev</code></td>
+      <td><code>bunx envboot check</code></td>
+    </tr>
+    <tr>
+      <td><b>pnpm</b></td>
+      <td><code>pnpm dlx envboot init</code></td>
+      <td><code>pnpm dev</code></td>
+      <td><code>pnpm dlx envboot check</code></td>
+    </tr>
+    <tr>
+      <td><b>Yarn</b></td>
+      <td><code>yarn dlx envboot init</code></td>
+      <td><code>yarn dev</code></td>
+      <td><code>yarn dlx envboot check</code></td>
+    </tr>
+    <tr>
+      <td><b>Deno</b></td>
+      <td><code>deno run -A npm:envboot init</code></td>
+      <td><code>deno task dev</code></td>
+      <td><code>deno run -A npm:envboot check</code></td>
+    </tr>
+  </tbody>
+</table>
+
+### Framework Detection
+
+* ✅ **Next.js** (App Router & Pages Router)
+* ✅ **Vite + React / Vue / Svelte**
+* ✅ **Express / Fastify / Koa**
+* ✅ **NestJS**
+* ✅ **Bun HTTP Server**
+* ✅ **Deno Server**
 
 ---
 
-## License
+## 📄 License
 
-MIT © EnvBoot Contributors
+MIT © [Ashish Ranjan](https://github.com/ashishrbuilds) & EnvBoot Contributors

@@ -1,0 +1,9 @@
+{
+  "required": [
+    "DATABASE_URL",
+    "JWT_SECRET"
+  ],
+  "optional": [
+    "REDIS_URL"
+  ]
+}

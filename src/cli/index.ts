@@ -7,9 +7,10 @@ const cli = cac("envboot");
 cli
   .command("init", "Automatically detect, configure, and install EnvBoot")
   .option("-y, --yes", "Skip interactive prompts and accept default detected options")
+  .option("--skip-install", "Skip automatic package installation")
   .action(async (options) => {
     try {
-      await runInit({ yes: options.yes });
+      await runInit({ yes: options.yes, skipInstall: options.skipInstall });
     } catch (err) {
       console.error("\nFailed to initialize EnvBoot:", (err as Error).message);
       process.exit(1);
@@ -33,6 +34,6 @@ cli
   });
 
 cli.help();
-cli.version("0.1.3");
+cli.version("0.1.4");
 
 cli.parse();

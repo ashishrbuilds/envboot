@@ -28,7 +28,7 @@ describe("CLI End-to-End", () => {
         `
       );
 
-      await runInit({ yes: true, cwd: tmpDir });
+      await runInit({ yes: true, cwd: tmpDir, skipInstall: true });
 
       // Verify .envboot.json created
       const configPath = path.join(tmpDir, ".envboot.json");

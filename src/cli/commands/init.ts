@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { execSync } from "child_process";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { scanProject } from "../core/scanner.js";
@@ -14,6 +15,7 @@ import {
 export interface InitCommandOptions {
   yes?: boolean;
   cwd?: string;
+  skipInstall?: boolean;
 }
 
 export async function runInit(options: InitCommandOptions = {}): Promise<void> {
@@ -104,10 +106,40 @@ export async function runInit(options: InitCommandOptions = {}): Promise<void> {
     applyInjection(injectionPlan, cwd);
   }
 
-  // 7. Success Outro
+  // 7. Install package dependency if needed
+  const deps = {
+    ...(projectInfo.packageJson?.dependencies || {}),
+    ...(projectInfo.packageJson?.devDependencies || {}),
+  };
+  const isInstalled = Boolean(deps["envboot"]);
+
+  if (!isInstalled && !options.skipInstall && (projectInfo.packageJson || projectInfo.denoConfig)) {
+    const installSpinner = isAutoYes ? null : p.spinner();
+    if (installSpinner) {
+      installSpinner.start(`Installing envboot with ${projectInfo.packageManager}...`);
+    }
+
+    try {
+      execSync(projectInfo.commands.install, {
+        cwd,
+        stdio: "ignore",
+      });
+      if (installSpinner) {
+        installSpinner.stop(`Installed envboot dependency via ${projectInfo.packageManager}.`);
+      }
+    } catch {
+      if (installSpinner) {
+        installSpinner.stop(
+          pc.yellow(`Could not auto-install envboot. Please run: ${projectInfo.commands.install}`)
+        );
+      }
+    }
+  }
+
+  // 8. Success Outro
   if (!isAutoYes) {
     p.outro(
-      `${pc.green("✔")} EnvBoot installed successfully!\n\n` +
+      `${pc.green("✔")} EnvBoot initialized successfully!\n\n` +
         `  ${pc.bold("Next steps:")}\n` +
         `  1. Ensure your environment has the required variables set.\n` +
         `  2. Start your app: ${pc.cyan(projectInfo.commands.runDev)}\n` +

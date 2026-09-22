@@ -34,7 +34,8 @@ export async function runCheck(options: CheckCommandOptions = {}): Promise<boole
 
   const contractRequired = new Set(config.required || []);
   const contractOptional = new Set(config.optional || []);
-  const allContractVars = new Set([...contractRequired, ...contractOptional]);
+  const contractIgnored = new Set(config.ignore || ["NODE_ENV", "TZ"]);
+  const allContractVars = new Set([...contractRequired, ...contractOptional, ...contractIgnored]);
 
   const undocumentedInCode: Array<{ name: string; files: string[] }> = [];
   for (const varName of scanResult.codeVariables) {

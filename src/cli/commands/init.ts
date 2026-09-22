@@ -76,6 +76,7 @@ export async function runInit(options: InitCommandOptions = {}): Promise<void> {
     {
       required: requiredVars,
       optional: optionalVars,
+      ignore: ["NODE_ENV", "TZ"],
     },
     null,
     2
@@ -99,11 +100,20 @@ export async function runInit(options: InitCommandOptions = {}): Promise<void> {
     }
   }
 
-  // 6. Apply Changes
+  // 6. Apply Changes (with loader)
+  const applySpinner = isAutoYes ? null : p.spinner();
+  if (applySpinner) {
+    applySpinner.start("Applying environment contract and configuring project...");
+  }
+
   fs.writeFileSync(configPath, configContent + "\n", "utf-8");
 
   if (injectionPlan && !injectionPlan.alreadyInjected) {
     applyInjection(injectionPlan, cwd);
+  }
+
+  if (applySpinner) {
+    applySpinner.stop("Applied environment contract and startup guard.");
   }
 
   // 7. Install package dependency if needed
@@ -138,12 +148,25 @@ export async function runInit(options: InitCommandOptions = {}): Promise<void> {
 
   // 8. Success Outro
   if (!isAutoYes) {
+    const devScriptExample =
+      projectInfo.framework === "vite"
+        ? 'envboot check && vite'
+        : `envboot check && ${projectInfo.commands.runDev}`;
+    const buildScriptExample =
+      projectInfo.framework === "vite"
+        ? 'envboot check && tsc -b && vite build'
+        : 'envboot check && npm run build';
+
     p.outro(
       `${pc.green("✔")} EnvBoot initialized successfully!\n\n` +
         `  ${pc.bold("Next steps:")}\n` +
         `  1. Ensure your environment has the required variables set.\n` +
         `  2. Start your app: ${pc.cyan(projectInfo.commands.runDev)}\n` +
-        `  3. Check environment status at any time: ${pc.cyan(projectInfo.commands.check)}\n`
+        `  3. Check environment status at any time: ${pc.cyan(projectInfo.commands.check)}\n` +
+        `  4. ${pc.bold("Best Practice (Fail-fast in package.json):")}\n` +
+        `     Add ${pc.cyan("envboot check")} to your scripts to block dev/build on missing variables:\n` +
+        `       ${pc.dim('"dev"')}:   ${pc.green(`"${devScriptExample}"`)}\n` +
+        `       ${pc.dim('"build"')}: ${pc.green(`"${buildScriptExample}"`)}\n`
     );
   } else {
     console.log(pc.green("✔ EnvBoot initialized successfully!"));

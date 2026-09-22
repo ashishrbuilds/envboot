@@ -1,6 +1,7 @@
 export interface EnvBootConfig {
   required?: string[];
   optional?: string[];
+  ignore?: string[];
   [key: string]: unknown;
 }
 

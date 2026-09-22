@@ -88,6 +88,7 @@ export async function runSync(options: SyncCommandOptions = {}): Promise<void> {
   const newConfig = {
     required: Array.from(finalRequired).sort(),
     optional: Array.from(finalOptional).sort(),
+    ignore: existingConfig?.ignore || ["NODE_ENV", "TZ"],
   };
 
   fs.writeFileSync(configPath, JSON.stringify(newConfig, null, 2) + "\n", "utf-8");

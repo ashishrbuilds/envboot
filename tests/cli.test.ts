@@ -39,6 +39,7 @@ describe("CLI End-to-End", () => {
       const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
       expect(config.required).toContain("DATABASE_URL");
       expect(config.required).toContain("JWT_SECRET");
+      expect(config.ignore).toEqual(["NODE_ENV", "TZ"]);
 
       // Verify entry point injected
       const entryContent = fs.readFileSync(path.join(tmpDir, "src", "index.ts"), "utf-8");

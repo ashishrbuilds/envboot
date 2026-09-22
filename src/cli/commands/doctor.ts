@@ -111,7 +111,8 @@ export async function runDoctor(options: DoctorCommandOptions = {}): Promise<boo
     }
 
     // Check code drift
-    const contractAll = new Set([...requiredList, ...optionalList]);
+    const ignoreList = config.ignore || ["NODE_ENV", "TZ"];
+    const contractAll = new Set([...requiredList, ...optionalList, ...ignoreList]);
     const undocumented: string[] = [];
     for (const codeVar of scanResult.codeVariables) {
       if (!contractAll.has(codeVar)) {

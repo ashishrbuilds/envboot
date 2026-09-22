@@ -45,6 +45,8 @@ const STANDARD_ENV_REGEX = /(?:process\.env|import\.meta\.env|Bun\.env)(?:\.([A-
 // Deno.env.get("FOO_BAR") / Deno.env.get('FOO_BAR')
 const DENO_ENV_REGEX = /Deno\.env\.get\(\s*['"`]([A-Za-z0-9_]+)['"`]\s*\)/g;
 
+export const DEFAULT_IGNORED_VARS = new Set(["NODE_ENV", "TZ"]);
+
 export function parseEnvFileContent(content: string): string[] {
   const vars: string[] = [];
   const lines = content.split("\n");
@@ -112,7 +114,7 @@ export async function scanProject(cwd: string = process.cwd()): Promise<ScanResu
         const content = fs.readFileSync(fullPath, "utf-8");
         const parsedKeys = parseEnvFileContent(content);
         for (const key of parsedKeys) {
-          if (key === "NODE_ENV") continue;
+          if (DEFAULT_IGNORED_VARS.has(key)) continue;
           envFileVariablesSet.add(key);
           const record = getOrCreate(key);
           if (!record.sources.inEnvFiles.includes(envFile)) {
@@ -145,7 +147,7 @@ export async function scanProject(cwd: string = process.cwd()): Promise<ScanResu
       while ((match = STANDARD_ENV_REGEX.exec(content)) !== null) {
         const varName = match[1] || match[2];
         if (!varName) continue;
-        if (varName === "NODE_ENV") continue;
+        if (DEFAULT_IGNORED_VARS.has(varName)) continue;
 
         codeVariablesSet.add(varName);
         const record = getOrCreate(varName);
@@ -159,7 +161,7 @@ export async function scanProject(cwd: string = process.cwd()): Promise<ScanResu
       while ((match = DENO_ENV_REGEX.exec(content)) !== null) {
         const varName = match[1];
         if (!varName) continue;
-        if (varName === "NODE_ENV") continue;
+        if (DEFAULT_IGNORED_VARS.has(varName)) continue;
 
         codeVariablesSet.add(varName);
         const record = getOrCreate(varName);

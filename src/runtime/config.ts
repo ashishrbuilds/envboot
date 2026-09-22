@@ -41,6 +41,7 @@ export function loadConfig(configPath?: string, cwd: string = process.cwd()): En
     return {
       required: Array.isArray(parsed.required) ? parsed.required : [],
       optional: Array.isArray(parsed.optional) ? parsed.optional : [],
+      ignore: Array.isArray(parsed.ignore) ? parsed.ignore : ["NODE_ENV", "TZ"],
       ...parsed,
     };
   } catch (error) {

@@ -74,7 +74,7 @@ export async function runDoctor(options: DoctorCommandOptions = {}): Promise<boo
   console.log(pc.dim("────────────────────────────────────────────────────────────"));
 
   // Check package dependency in package.json
-  const deps = {
+  const deps: Record<string, any> = {
     ...(projectInfo.packageJson?.dependencies || {}),
     ...(projectInfo.packageJson?.devDependencies || {}),
   };

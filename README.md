@@ -24,6 +24,9 @@ npx envboot@latest init
 [**Doctor Diagnostics**](#-diagnostic-health-check-envboot-doctor) &bull;
 [**Sync Contract**](#-synchronizing-contract--templates-envboot-sync) &bull;
 [**CI/CD Guard**](#-cicd-drift-protection-envboot-check) &bull;
+[**Automatic .env Loader**](#-automatic-env-file-loading-zero-dependency) &bull;
+[**CLI Reference**](#-cli-commands-reference) &bull;
+[**Configuration**](#-configuration-envbootjson) &bull;
 [**Runtime API**](#-runtime-api) &bull;
 [**Ecosystem**](#-supported-runtimes--package-managers)
 
@@ -73,7 +76,20 @@ EnvBoot scans your codebase, extracts all `process.env`, `Bun.env`, `Deno.env`, 
 │
 ◇  Entry point detected: src/server.ts
 │
-✓  EnvBoot installed successfully!
+◇  Applied environment contract and startup guard.
+│
+◇  Installed envboot dependency.
+│
+✔  EnvBoot initialized successfully!
+
+  Next steps:
+  1. Ensure your environment has the required variables set.
+  2. Start your app: npm run dev
+  3. Check environment status at any time: npx envboot check
+  4. Best Practice (Fail-fast in package.json):
+     Add envboot check to your scripts to block dev/build on missing variables:
+       "dev":   "envboot check && npm run dev"
+       "build": "envboot check && npm run build"
 ```
 
 Now, whenever anyone boots the application without the required environment:
@@ -103,9 +119,11 @@ Set the required variables in your .env file or environment before starting.
 | **Runtime Dependencies** | **`0` (Zero)** | `0` | Heavy (~50kb+) | 3+ deps |
 | **Code Refactoring** | **None** (Keep `process.env.X`) | High boilerplate | Requires `env.X` wrappers | None |
 | **Automated AST Codebase Scanner** | **Yes** | ❌ No | ❌ No | ❌ No |
-| **Interactive Setup CLI** | **Yes** | ❌ No | ❌ No | ❌ No |
+| **Interactive Setup CLI & Auto-Install** | **Yes** | ❌ No | ❌ No | ❌ No |
+| **Built-in Cascading `.env*` Loader** | **Yes (Zero-dep)** | ❌ No | ❌ No | Requires `dotenv` |
+| **Browser / Client-Safe Build** | **Yes (`envboot/browser`)** | Manual | Heavy bundle | ❌ Node only |
 | **CI/CD Drift & Stale Var Detection** | **Yes** | ❌ No | ❌ No | Partial |
-| **Multi-Runtime (Node, Bun, Deno)** | **Yes** | Manual | Varies | Node only |
+| **Multi-Runtime (Node, Bun, Deno, Vite)** | **Yes** | Manual | Varies | Node only |
 | **Secret Masking Guarantee** | **Yes** | Manual | Manual | Partial |
 
 ---
@@ -133,7 +151,10 @@ yarn dlx envboot@latest init
 deno run --allow-all npm:envboot@latest init
 ```
 
-> **Prefer non-interactive?** Pass `--yes` to accept all detected variables: `npx envboot@latest init --yes`
+> [!TIP]
+> **CLI Flags:**
+> * Pass `--yes` (or `-y`) to accept all detected variables non-interactively: `npx envboot@latest init --yes`
+> * Pass `--skip-install` to skip automatic dependency installation: `npx envboot@latest init --skip-install`
 
 ### 2. Startup Guard Injection
 
@@ -201,7 +222,7 @@ import ReactDOM from 'react-dom/client';
 Run `envboot doctor` to perform an end-to-end diagnostic of your framework, package manager, `.env` files, contract schema, and startup injection:
 
 ```bash
-npx envboot doctor   # or pnpm dlx envboot doctor / bunx envboot doctor
+npx envboot@latest doctor   # or bunx envboot@latest doctor / pnpm dlx envboot@latest doctor
 ```
 
 ```text
@@ -218,13 +239,15 @@ Project Environment
 
 Diagnostics & Health
 ────────────────────────────────────────────────────────────
-  ✓ Package dependency: envboot (0.1.5)
+  ✓ Package dependency: envboot (0.1.7)
   ✓ Contract schema: 2 required, 1 optional variable(s)
   ✓ All required variables are set in environment
   ✓ Source code and contract are fully in sync (0 drift)
 
 ✨ Everything looks healthy! No issues detected.
 ```
+
+> **Options:** Pass `-c <path>` or `--config <path>` to specify a custom contract path: `npx envboot@latest doctor -c custom/.envboot.json`
 
 ---
 
@@ -234,13 +257,16 @@ When you introduce new environment variables to your codebase, run `envboot sync
 
 ```bash
 # Interactive classification
-npx envboot sync
+npx envboot@latest sync
 
 # Automated sync in CI or pre-commit hooks
-npx envboot sync --yes
+npx envboot@latest sync --yes
 
 # Automatically prune variables removed from codebase
-npx envboot sync --yes --prune
+npx envboot@latest sync --yes --prune
+
+# Custom contract path
+npx envboot@latest sync -c custom/.envboot.json
 ```
 
 ---
@@ -253,7 +279,14 @@ Run `envboot check` in local verification or CI/CD pipelines to ensure that:
 3. Stale variables defined in `.env` files that are no longer used in code are flagged.
 
 ```bash
-npx envboot check
+# Standard check
+npx envboot@latest check
+
+# Strict mode: fail build if undocumented variables are used in source code
+npx envboot@latest check --strict
+
+# Custom contract path
+npx envboot@latest check -c custom/.envboot.json
 ```
 
 ### Sample Output
@@ -284,6 +317,9 @@ Result: FAILED
 Error: Missing 1 required environment variable(s).
 ```
 
+> [!TIP]
+> **Ignoring System Variables**: Standard system/runtime variables like `NODE_ENV` and `TZ` are ignored by default. You can add any custom variables to the `"ignore": [...]` array in `.envboot.json` to prevent them from triggering drift warnings.
+
 ### GitHub Actions Workflow Recipe
 
 ```yaml
@@ -312,6 +348,22 @@ jobs:
 
 ---
 
+## ⚡ Automatic `.env` File Loading (Zero-Dependency)
+
+EnvBoot automatically discovers, parses, and loads local `.env` files into your application with zero external runtime dependencies (no `dotenv` needed):
+
+* **Cascading Precedence (Highest to Lowest):**
+  1. System Environment (`process.env` / Docker / Kubernetes / CI secrets)
+  2. `.env.[development|test|production].local`
+  3. `.env.[development|test|production]` (based on `NODE_ENV`)
+  4. `.env.local`
+  5. `.env`
+
+* **Full Syntax Support:** Handles quoted values (`"..."`, `'...'`, `` `...` ``), escape sequences (`\n`, `\t`), comments (`#`), and `export VAR=value` syntax.
+* **Production Safe:** System environment variables take top priority and are never overwritten by `.env` files.
+
+---
+
 ## ⚙️ Configuration (`.envboot.json`)
 
 The generated `.envboot.json` contract is lightweight, human-readable, and version-controlled:
@@ -326,9 +378,30 @@ The generated `.envboot.json` contract is lightweight, human-readable, and versi
   "optional": [
     "REDIS_URL",
     "SENTRY_DSN"
+  ],
+  "ignore": [
+    "NODE_ENV",
+    "TZ"
   ]
 }
 ```
+
+### Schema Properties
+
+* `required`: Mandatory variables. Application terminates immediately on startup with exit code `1` if any are missing or empty.
+* `optional`: Optional variables. EnvBoot warns about missing values in terminal output, but does not abort startup.
+* `ignore`: System or framework variables excluded from drift detection and missing warnings (defaults to `["NODE_ENV", "TZ"]`).
+
+---
+
+## 🛠️ CLI Commands Reference
+
+| Command | Flags | Description |
+| :--- | :--- | :--- |
+| `envboot init` | `-y, --yes`<br>`--skip-install` | Scans codebase, generates `.envboot.json`, injects startup guard, and installs `envboot` |
+| `envboot check` | `--strict`<br>`-c, --config <path>` | Validates environment against contract, checks for missing variables and source drift |
+| `envboot doctor` | `-c, --config <path>` | Runs full diagnostics on project setup, framework, package manager, and contract health |
+| `envboot sync` | `-y, --yes`<br>`--prune`<br>`-c, --config <path>` | Scans for new variables, updates `.envboot.json`, and refreshes `.env.example` |
 
 ---
 

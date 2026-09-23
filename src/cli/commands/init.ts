@@ -117,7 +117,7 @@ export async function runInit(options: InitCommandOptions = {}): Promise<void> {
   }
 
   // 7. Install package dependency if needed
-  const deps = {
+  const deps: Record<string, any> = {
     ...(projectInfo.packageJson?.dependencies || {}),
     ...(projectInfo.packageJson?.devDependencies || {}),
   };

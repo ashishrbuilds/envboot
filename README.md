@@ -507,8 +507,6 @@ MIT © [Ashish Ranjan](https://github.com/ashishrbuilds) & [EnvBoot Contributors
   <a href="https://ashishrbuilds.github.io/envboot-core/">📖 Documentation</a> &bull;
   <a href="https://www.npmjs.com/package/envboot">📦 npm</a> &bull;
   <a href="https://github.com/ashishrbuilds/envboot/issues">🐛 Issues</a>
-
-  <br /><br />
-
+  <br/>
   Made with ❤️ by <a href="https://github.com/ashishrbuilds">@ashishrbuilds</a>
 </div>

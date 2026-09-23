@@ -1,34 +1,44 @@
 <div align="center">
 
-# ⚡ EnvBoot
+  <a href="https://github.com/ashishrbuilds/envboot" target="_blank" rel="noopener noreferrer">
+    <img src="https://raw.githubusercontent.com/ashishrbuilds/envboot/main/assets/envboot.png" alt="EnvBoot Logo" width="120" height="120" />
+  </a>
 
-### *Your app shouldn't start with a broken environment.*
+  <h1>EnvBoot</h1>
 
-**Automatically discover, configure, and validate environment variables with zero runtime overhead.**
+  <p><strong>Your app shouldn't start with a broken environment.</strong></p>
 
-[![npm version](https://img.shields.io/npm/v/envboot?color=38bdf8&label=npm%20package)](https://www.npmjs.com/package/envboot)
-[![GitHub Stars](https://img.shields.io/github/stars/ashishrbuilds/envboot?style=social)](https://github.com/ashishrbuilds/envboot)
-[![Runtime Dependencies](https://img.shields.io/badge/runtime%20dependencies-0-10b981.svg)](https://www.npmjs.com/package/envboot)
-[![Node / Bun / Deno](https://img.shields.io/badge/runtimes-Node%20%7C%20Bun%20%7C%20Deno-a855f7)](https://www.npmjs.com/package/envboot)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+  <p>Automatically discover, configure, and validate environment variables with zero runtime overhead.</p>
 
-<br />
+  <p>
+    <a href="https://www.npmjs.com/package/envboot"><img src="https://img.shields.io/npm/v/envboot?color=38bdf8&label=npm%20package" alt="npm version" /></a>
+    <a href="https://github.com/ashishrbuilds/envboot"><img src="https://img.shields.io/github/stars/ashishrbuilds/envboot?style=social" alt="GitHub Stars" /></a>
+    <a href="https://www.npmjs.com/package/envboot"><img src="https://img.shields.io/badge/runtime%20dependencies-0-10b981.svg" alt="Runtime Dependencies" /></a>
+    <a href="https://www.npmjs.com/package/envboot"><img src="https://img.shields.io/badge/runtimes-Node%20%7C%20Bun%20%7C%20Deno-a855f7" alt="Node / Bun / Deno" /></a>
+    <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT" /></a>
+  </p>
 
-```bash
-npx envboot@latest init
-```
+  <br />
 
-[**Quickstart**](#-quick-start) &bull;
-[**Why EnvBoot?**](#-why-envboot) &bull;
-[**Interactive Demo**](#-the-30-second-demo) &bull;
-[**Doctor Diagnostics**](#-diagnostic-health-check-envboot-doctor) &bull;
-[**Sync Contract**](#-synchronizing-contract--templates-envboot-sync) &bull;
-[**CI/CD Guard**](#-cicd-drift-protection-envboot-check) &bull;
-[**Automatic .env Loader**](#-automatic-env-file-loading-zero-dependency) &bull;
-[**CLI Reference**](#-cli-commands-reference) &bull;
-[**Configuration**](#-configuration-envbootjson) &bull;
-[**Runtime API**](#-runtime-api) &bull;
-[**Ecosystem**](#-supported-runtimes--package-managers)
+  ```bash
+  npx envboot@latest init
+  ```
+
+  <br />
+
+  <p>
+    <a href="#-quick-start"><b>Quickstart</b></a> &bull;
+    <a href="#-why-envboot"><b>Why EnvBoot?</b></a> &bull;
+    <a href="#-the-30-second-demo"><b>Interactive Demo</b></a> &bull;
+    <a href="#-diagnostic-health-check-envboot-doctor"><b>Doctor Diagnostics</b></a> &bull;
+    <a href="#-synchronizing-contract--templates-envboot-sync"><b>Sync Contract</b></a> &bull;
+    <a href="#-cicd-drift-protection-envboot-check"><b>CI/CD Guard</b></a> &bull;
+    <a href="#-automatic-env-file-loading-zero-dependency"><b>Automatic .env Loader</b></a> &bull;
+    <a href="#-cli-commands-reference"><b>CLI Reference</b></a> &bull;
+    <a href="#-configuration-envbootjson"><b>Configuration</b></a> &bull;
+    <a href="#-runtime-api"><b>Runtime API</b></a> &bull;
+    <a href="#-supported-runtimes--package-managers"><b>Ecosystem</b></a>
+  </p>
 
 </div>
 
@@ -488,4 +498,4 @@ console.log(status.presentRequired); // string[]
 
 ## 📄 License
 
-MIT © [Ashish Ranjan](https://github.com/ashishrbuilds) & EnvBoot Contributors
+MIT © [Ashish Ranjan](https://github.com/ashishrbuilds) & [EnvBoot Contributors](https://github.com/ashishrbuilds/envboot/graphs/contributors)

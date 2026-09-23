@@ -1,7 +1,7 @@
 <div align="center">
 
   <a href="https://github.com/ashishrbuilds/envboot" target="_blank" rel="noopener noreferrer">
-    <img src="https://raw.githubusercontent.com/ashishrbuilds/envboot/main/assets/envboot.png" alt="EnvBoot Logo" width="120" height="120" />
+    <img src="https://raw.githubusercontent.com/ashishrbuilds/envboot-core/main/src/assets/envboot.png" alt="EnvBoot Logo" width="120" height="120" />
   </a>
 
   <h1>EnvBoot</h1>
